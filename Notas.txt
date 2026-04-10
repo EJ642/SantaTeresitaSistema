@@ -1,0 +1,176 @@
+================================================================================
+DOCUMENTACIÓN DEL SISTEMA
+================================================================================
+Para empezar hay que cargar esta carpeta completa dentro de XAMP dentro de
+htdoc e importar la bd escuela en phpMyadmim, luego para provar en el navegador 
+escribi http://localhost/IGS_2/
+
+
+
+FLUJO DE RECUPERACIÓN DE CONTRASEÑA
+
+ARCHIVOS INVOLUCRADOS:
+- recuperar_clave.php    (Formulario de solicitud de recuperación)
+- cambiar_password.php   (Formulario para establecer nueva contraseña)
+- servicios/conexion.php (Funciones de base de datos)
+- servicios/mailer_config.php (Configuración de PHPMailer)
+
+================================================================================
+1. RECUPERAR_CLAVE.PHP - SOLICITUD DE RECUPERACIÓN
+================================================================================
+
+FLUJO GENERAL:
+El usuario ingresa su correo → Se valida y se genera un token → Se envía email 
+con enlace seguro → El usuario recibe instrucciones
+
+PASO A PASO:
+
+1. VALIDACIÓN DEL CORREO
+   - El usuario ingresa su correo en el formulario
+   - Se valida que NO esté vacío
+   - Se limpia la cadena (previene SQL injection)
+   - Se busca en BD si el correo existe y el usuario está Activo
+
+2. GENERACIÓN DEL TOKEN
+   - Si el correo existe, se genera un token aleatorio con: bin2hex(random_bytes(32))
+   - Este token se guarda en la BD (campo 'token')
+   - Se establece expiración de 1 HORA (token_expira = NOW() + 1 HOUR)
+
+3. ENVÍO DE EMAIL CON PHPMAILER
+   - Usa SMTP (correo SMTP configurado en mailer_config.php)
+   - El correo contiene:
+     * Saludo personalizado con el nombre del usuario
+     * Enlace con parámetros: cambiar_password.php?id=123&token=abc123...
+     * El enlace es válido solo por 1 hora
+     * Botón "RESTABLECER CONTRASEÑA"
+
+4. RESPUESTAS AL USUARIO
+   - SUCCESS: Se avisa que revise correo e inbox/spam
+   - ERROR: Correo no registrado o usuario inactivo
+   - ERROR: Token no se generó (problema en BD)
+   - ERROR: Fallo al enviar email (problema con SMTP)
+
+================================================================================
+2. CAMBIAR_PASSWORD.PHP - ESTABLECER NUEVA CONTRASEÑA
+================================================================================
+
+FLUJO GENERAL:
+Usuario hace clic en enlace del email → Se valida token → Muestra formulario → 
+Usuario ingresa nueva contraseña → Se encripta y guarda
+
+PASO A PASO:
+
+1. VALIDACIÓN DE PARÁMETROS URL
+   - Verifica que lleguen id y token por GET
+   - Si no vienen, redirige a index.php (seguridad)
+   - Se limpian ambos parámetros
+
+2. VALIDACIÓN DEL TOKEN EN BD
+   - Busca usuario con ese ID
+   - Verifica que el token coincida exactamente
+   - Verifica que NO haya expirado: token_expira > NOW()
+   - Si TODO es correcto → muestra formulario
+   - Si alguno falla → muestra error y enlace para solicitar de nuevo
+
+3. PROCESAMIENTO DEL CAMBIO DE PASSWORD
+   - Valida que ambas contraseñas estén llenas
+   - Verifica que ambas coincidan exactamente
+   - Encripta con PASSWORD_BCRYPT (algoritmo seguro)
+   - Actualiza en BD la nueva contraseña
+   - IMPORTANTE: Borra el token (token = NULL) para que NO se reutilice el enlace
+
+4. RESPUESTAS AL USUARIO
+   - SUCCESS: Contraseña actualizada correctamente + botón ir a login
+   - ERROR: Enlace no válido o expirado (opción solicitar nuevo)
+   - ERROR: Contraseñas no coinciden
+   - ERROR: Campos vacíos
+   - ERROR: Fallo al actualizar contraseña
+
+================================================================================
+3. FLUJO COMPLETO (VER GENERAL)
+================================================================================
+
+USUARIO OLVIDA CONTRASEÑA
+   ↓
+   Va a login.php → Clic en "¿Olvidaste tu contraseña?"
+   ↓
+   Abre recuperar_clave.php → Ingresa su correo
+   ↓
+   VALIDACIÓN:
+   • ¿Correo existe y usuario está Activo? → Continúa
+   • ¿Correo NO existe o usuario inactivo? → Muestra error
+   ↓
+   GENERACIÓN:
+   • Se crea token aleatorio (32 bytes en hexadecimal)
+   • Se guarda en BD con expiración de 1 hora
+   ↓
+   ENVÍO DE EMAIL:
+   • El sistema envía email con el enlace de recuperación
+   • Enlace incluye: id del usuario + token único
+   ↓
+   USUARIO RECIBE EMAIL
+   ↓
+   Usuario hace clic en botón "RESTABLECER CONTRASEÑA"
+   ↓
+   Se abre cambiar_password.php?id=123&token=abc123xyz...
+   ↓
+   VALIDACIÓN:
+   • ¿Token es válido? → Muestra formulario
+   • ¿Token NO válido o expirado? → Muestra error
+   ↓
+   Usuario ingresa nueva contraseña 2 veces
+   ↓
+   CAMBIO:
+   • Se valida que sean iguales
+   • Se encripta con BCRYPT (seguro)
+   • Se guarda en BD
+   • Se elimina el token (no se puede reutilizar)
+   ↓
+   Usuario ve confirmación → Puede hacer login con nueva contraseña
+
+================================================================================
+4. CONSIDERACIONES DE SEGURIDAD
+================================================================================
+
+✓ Limpieza de datos: Se usa limpiar_cadena() contra SQL injection
+✓ Encriptación: PASSWORD_BCRYPT (no se guarda contraseña en texto plano)
+✓ Tokens únicos: bin2hex(random_bytes(32)) = 64 caracteres aleatorios
+✓ Expiración: 1 hora (no hay tokens eternos)
+✓ Una sola vez: Token se borra después de usarse (no se puede reutilizar)
+✓ Validaciones: Se verifica todo antes de cada operación
+✓ Email seguro: SMTP con credenciales (no por texto plano)
+
+================================================================================
+5. ARCHIVOS CLAVE - FUNCIONES USADAS
+================================================================================
+
+De servicios/conexion.php:
+- limpiar_cadena()      → Limpia inputs (previene SQL injection)
+- buscar_datos()        → Busca en BD y devuelve array de resultados
+- actualizar_datos()    → Ejecuta UPDATE en BD
+
+De servicios/mailer_config.php:
+- Constantes SMTP: MAIL_HOST, MAIL_USERNAME, MAIL_PASSWORD, etc.
+- Constante URL_SISTEMA: URL base del sistema (para generar enlace)
+- DEBUG_MAIL: Para ver detalles si hay error
+
+De phpmailer/src/:
+- PHPMailer    → Clase principal para enviar emails
+- Exception    → Manejo de errores
+- SMTP         → Protocolo de envío
+
+================================================================================
+6. NOTAS PARA EL EQUIPO
+================================================================================
+
+• El token debe ser ÚNICO y NO predecible (random_bytes es seguro)
+• La expiración de 1 HORA es balanceada: seguridad vs comodidad del usuario
+• SIEMPRE validar que token NO sea NULL antes de permitir cambio
+• SIEMPRE borrar token después de usarlo (no se puede usar 2 veces)
+• El email debe configurarse correctamente en mailer_config.php
+• Si el usuario no recibe email, revisar: Spam, DNS SMTP, credenciales
+• NO GUARDAR NUNCA contraseña en texto plano
+• SIEMPRE usar PASSWORD_BCRYPT para encriptar
+
+================================================================================
+

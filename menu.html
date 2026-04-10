@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+</head>
+
+<body>
+    <div class="sidebar" id="sidebar">
+        <div class="menu-btn" id="menu-btn">
+            <i class='bx bx-chevron-left'></i>
+        </div>
+        <div class="brand">
+            <span>Santa Teresita</span>
+        </div>
+
+        <div class="menu-container">
+            <ul class="menu">
+                <li class="menu-item menu-item-static active"><a href="menu.html" class="menu-link"><i
+                            class='bx bx-home'></i>
+                        Inicio</a></li>
+                <li class="menu-item menu-item-dropdown"><a href="#" class="menu-link"><i class='bx bx-grid-alt'></i>
+                        Mantenimientos<i class='bx bx-chevron-down linki'></i></a>
+                    <ul class="sub-menu">
+                        <li><a href="forms/usuarios.php" class="sub-menu-item">Usuarios</a></li>
+                        <li><a href="profesores.html" class="sub-menu-item">Profesores</a></li>
+                        <li><a href="#" class="sub-menu-item">Alumnos</a></li>
+                        <li><a href="#" class="sub-menu-item">Especialidades</a></li>
+                        <li><a href="#" class="sub-menu-item">Cursos</a></li>
+                        <li><a href="#" class="sub-menu-item">Materias</a></li>
+                    </ul>
+                </li>
+                <li class="menu-item menu-item-static"><a href="menu.html" class="menu-link"><i
+                            class='bx bx-book-open'></i>
+                        Resumen Calificaciones</a></li>
+
+            </ul>
+        </div>
+        <div class="footer">
+            <ul class="menu">
+                <li class="menu-item"><a href="#" class="menu-link"><i class='bx bx-cog'></i> Configuración</a></li>
+            </ul>
+            <div class="user">
+                <div class="user-img">
+                    <img src="img/fondo-exmpl.jpg" alt="">
+                </div>
+                <div class="user-data">
+                    <span class="name">Usuario</span>
+                    <span class="rol">Admin</span>
+                </div>
+                <div class="user-icon exit-btn" id="exit-btn">
+                    <i class="bx bx-exit"></i>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
