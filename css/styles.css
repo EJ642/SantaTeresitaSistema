@@ -1,0 +1,261 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Poppins", sans-serif;
+}
+
+:root {
+    --color-bg: #EBECF2;
+    --color-surface: #FFFFFF;
+    --color-border: #9A9EB2;
+    --color-text-primary: #000;
+    --color-text-secondary: #3F435D;
+    --color-tooltip-bg: #2A2E33;
+    --color-tooltip-text: #fff;
+    --shadow-border: rgba(0, 0, 0, 0.1);
+    --user-bg-color: #FAFAFC;
+}
+
+body {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    background-color: #EBECF2;
+}
+
+.sidebar {
+    position: fixed;
+    width: 17rem;
+    height: 100%;
+    background-color: #fff;
+    z-index: 1000;
+}
+
+.main-content {
+    margin-left: 17rem;
+    width: calc(100% - 17rem);
+    padding: 20px;
+}
+
+.sidebar.minimize{
+    width: 5.42rem;
+}
+
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+}
+
+.menu-container {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    flex-direction: column;
+}
+
+
+/*Menu*/
+.menu-btn {
+    border: 2px solid rgb(2, 0, 0);
+    position: absolute;
+    top: 3.5%;
+    right: -0.87rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background-color: #fff;
+    color: #757575;
+    box-shadow: 2px 2px 5px var(--shadow-border);
+    cursor: pointer;
+    transition: right 0.3s ease;
+}
+
+.menu-btn i{
+    font-size: 1.5rem;
+}
+
+.sidebar.minimize .menu-btn{
+    right: -2.2rem;
+}
+.sidebar.minimize .menu-btn i{
+    transform: rotate(180deg);
+}
+
+.sidebar.minimize .menu-item:hover,
+.sidebar.minimize .menu-item.sub-menu-toggle{
+    overflow: visible;
+}
+
+.sidebar.minimize .menu-item:hover span,
+.sidebar.minimize .menu-item.sub-menu-toggle span{
+    position: absolute;
+    left: 4.2rem;
+    padding: 0.5rem;
+    background-color: var(--color-tooltip-bg);
+    border-radius: 0.4rem;
+    color: var(--color-tooltip-text);
+    transition: all 0.3s ease;
+}
+
+.menu {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.menu .menu-item {
+    position: relative;
+    list-style: none;
+    overflow: hidden;
+}
+
+.menu .menu-link {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 0.8rem;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: 0.3rem;
+}
+
+.menu-link i {
+    font-size: 1.35rem;
+    padding: 0 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+
+
+.menu-link span{
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+
+.menu-item.sub-menu-toggle .menu-link i:last-child{
+    transform: rotate(180deg);
+    
+}
+
+
+.menu-item:hover .menu-link,
+.sub-menu .sub-menu-item:hover,
+.menu-item.active .menu-link {
+    color: var(--color-text-primary);
+    background-color: var(--color-bg);
+}
+
+.linki {
+    margin-left: auto;
+}
+
+
+.sub-menu{
+    height: 0;
+    transition: all 0.3s ease;
+    overflow: hidden;
+    left: 0;
+}
+
+
+.sidebar.minimize .sub-menu{
+    position: absolute;
+    left: 4.4rem;
+    top: 3.1rem;
+    background-color: var(--color-surface);
+    border-radius: 0.2rem;
+}
+
+
+.sub-menu .sub-menu-item {
+    display: flex;
+    margin-left: 4.0rem;
+    padding: 0.55rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--color-text-secondary);
+    text-decoration: none;
+    border-radius: 0.3rem;
+}
+
+
+.sub-menu::before{
+    content: "";
+    position: absolute;
+    height: 100%;
+    width: 0.07rem;
+    margin-left: 2.3rem;
+    background-color: var(--color-border);
+}
+
+.sidebar.minimize .sub-menu::before{
+    width: 0;
+}
+
+.sidebar.minimize .sub-menu a{
+    margin: 0 0.5rem;
+}
+
+.footer{
+    width: 100%;
+    padding: 1rem 0;
+    box-shadow: 0 -0.02rem 0 0 var(--color-border);
+}
+
+.user{
+    display: flex;
+    overflow: hidden;
+    margin-top: 1rem;
+}
+
+.user-img{
+    display: flex;
+    margin: 0 0.7rem 0 0.35rem;
+}
+
+.user-img img{
+    width: 2.2rem;
+    height: 2.2rem;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.user-data{
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.user-data .name{
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+.user-data .rol{
+    font-size: 0.6rem;
+    color: var(--color-text-secondary);
+}
+
+.user-icon{
+    margin-left: auto; 
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    padding-right: 0.5rem;
+}
